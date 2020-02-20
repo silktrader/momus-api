@@ -1,0 +1,103 @@
+= Momus API
+
+== Description
+
+This ASP.NET Core Web API allows one to store, edit and query a set of *books* and their *reviews*.
+
+Data is saved to a _LiteDb database_, on file and provided via _REST_ endpoints. Various statistics, pertaining to books, their reviews and the reading process are computed, provided sufficient entries are contributed.
+
+== Installation
+The following steps describe how to deploy the APIs to a somewhat recent Linux machine (Ubuntu's 18:04 in the author's case).
+
+1. Download and install Microsoft's .NET Core packages
+
+  wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+
+2. update packages list
+
+  apt-get update
+
+3. install https transport package
+
+  sudo apt-get install apt-transport-https
+
+4. install ASP.NET Core runtimes
+
+  sudo apt-get install aspnetcore-runtime-3.1
++
+[NOTE]
+====
+ASP.NET Core runtimes are sufficient. There's no need for the SDK unless one wants to build and publish the project from the server itself.
+====
+
+5. create folder where to store .NET published files
+
+  mkdir /var/www/momus
+
+6. build the project on the development machine, selecting the right target `Linux x64`
+
+  dotnet publish --configuration Release
+
+7. package, SCP or otherwise transfer the release files to `/var/www/momus`
+
+8. assign proper permissions when required by the web server
+
+  chown -R www-data /var/www/momus
+
+9. edit `nginx` configuration so it includes the following server block:
++
+./etc/nginx/sites-enabled/default
+[source]
+----
+server {
+  listen        80;
+  server_name   DOMAIN or IP ADDRESS;
+  location / {
+      proxy_pass         http://localhost:5000;
+      proxy_http_version 1.1;
+      proxy_set_header   Upgrade $http_upgrade;
+      proxy_set_header   Connection keep-alive;
+      proxy_set_header   Host $host;
+      proxy_cache_bypass $http_upgrade;
+      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Proto $scheme;
+  }
+}
+----
+
+10. create a service file to run the web API automatically
+
+  sudo vim /etc/systemd/system/kestrel-momus.service
++
+.kestrel-momus.service
+[source]
+----
+[Unit]
+Description=Momus
+
+[Service]
+WorkingDirectory=/var/www/momus
+ExecStart=/usr/bin/dotnet /var/www/momus/momus-api.dll
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=dotnet-example
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Development
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target
+----
+
+11. Enable the service
+
+  sudo systemctl enable kestrel-momus.service
+
+12. Start the service
+
+  sudo systemctl start kestrel-momus.service
+
+13. Verify it's actually running
+
+  sudo systemctl status kestrel-momus.service
