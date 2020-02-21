@@ -1,16 +1,19 @@
 using System.Collections.Generic;
+using Momus.Models;
 
-namespace Momus.Services {
-  public interface ILiteDbBookService {
-    IEnumerable<Book> GetAll ();
-    Book GetOne (string shortUrl);
+namespace Momus.Services
+{
+  public interface ILiteDbBookService
+  {
+    IEnumerable<BookDetailsDto> GetAll();
+    BookDto GetOne(string shortUrl);
 
-    IEnumerable<Book> GetReadYear (int year);
-    IEnumerable<Book> GetUnknownReadYear();
-    
-    int Add (Book book);
-    bool Update(Book book);
-    bool Remove (int id);
+    IEnumerable<BookDetailsDto> GetReadYear(int year);
+    IEnumerable<BookDetailsDto> GetUnknownReadYear();
+
+    int Add(BookDto dto);
+    bool Update(BookDto dto);
+    bool Remove(int id);
 
     IEnumerable<int?> GetFinishedYears();
   }

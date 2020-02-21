@@ -1,8 +1,8 @@
 using System;
 
-namespace Momus
+namespace Momus.Models
 {
-  public class Book
+  public class BookDetailsDto
   {
     public int Id { get; set; }
     public string Isbn { get; set; }
@@ -21,7 +21,5 @@ namespace Momus
 
     public int? Rating { get; set; }
     public int? Hours { get; set; }
-
-    public string ReviewHtml { get; set; }
   }
 }
