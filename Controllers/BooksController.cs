@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Momus.Data;
 using Momus.Models;
 using Momus.Services;
 
@@ -51,6 +50,12 @@ namespace Momus.Controllers
     public ActionResult<BookDto[]> GetUnknownReadYear()
     {
       return Ok(_bookService.GetUnknownReadYear());
+    }
+
+    [HttpGet("latest")]
+    public ActionResult<IEnumerable<BookDetailsDto>> LatestReviews([FromQuery] int latest)
+    {
+      return Ok(_bookService.GetLatest(latest));
     }
 
     [HttpPost]

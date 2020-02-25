@@ -19,9 +19,19 @@ namespace Momus.Services
       this.mapper = mapper;
     }
 
+    public BookDto GetOne(string shortUrl)
+    {
+      return mapper.MapBook(books.FindOne(item => item.Url == shortUrl));
+    }
+
     public IEnumerable<BookDetailsDto> GetAll()
     {
       return books.FindAll().Select(book => mapper.MapDetails(book));
+    }
+
+    public IEnumerable<BookDetailsDto> GetLatest(int number)
+    {
+      return books.FindAll().OrderBy(book => book.Reviewed).Take(number).Select(book => mapper.MapDetails(book));
     }
 
     public IEnumerable<BookDetailsDto> GetReadYear(int year)
@@ -32,11 +42,6 @@ namespace Momus.Services
     public IEnumerable<BookDetailsDto> GetUnknownReadYear()
     {
       return books.Find(book => book.Finished == null).Select(book => mapper.MapDetails(book));
-    }
-
-    public BookDto GetOne(string shortUrl)
-    {
-      return mapper.MapBook(books.FindOne(item => item.Url == shortUrl));
     }
 
     public int Add(BookDto dto)

@@ -5,8 +5,9 @@ namespace Momus.Services
 {
   public interface ILiteDbBookService
   {
-    IEnumerable<BookDetailsDto> GetAll();
     BookDto GetOne(string shortUrl);
+    IEnumerable<BookDetailsDto> GetAll();
+    IEnumerable<BookDetailsDto> GetLatest(int number);
 
     IEnumerable<BookDetailsDto> GetReadYear(int year);
     IEnumerable<BookDetailsDto> GetUnknownReadYear();
