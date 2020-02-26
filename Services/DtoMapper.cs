@@ -16,6 +16,8 @@ namespace Momus.Services
         Words = book.Words,
         Language = book.Language,
         Cover = book.Cover,
+        Category = book.Category,
+        Tags = book.Tags,
 
         Published = book.Published,
         Started = book.Started,
@@ -56,6 +58,8 @@ namespace Momus.Services
         Words = dto.Details.Words,
         Language = dto.Details.Language,
         Cover = dto.Details.Cover,
+        Category = dto.Details.Category,
+        Tags = dto.Details.Tags,
 
         Published = dto.Details.Published,
         Started = dto.Details.Started,

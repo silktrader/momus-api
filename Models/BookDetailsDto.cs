@@ -13,6 +13,8 @@ namespace Momus.Models
     public int? Words { get; set; }
     public string Language { get; set; }
     public string Cover { get; set; }
+    public Categories Category { get; set; }
+    public string[] Tags { get; set; }
 
     public DateTime? Published { get; set; }
     public DateTime? Started { get; set; }

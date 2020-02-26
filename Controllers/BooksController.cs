@@ -11,14 +11,15 @@ namespace Momus.Controllers
   [Route("api/[controller]")]
   public class BooksController : ControllerBase
   {
-
     private readonly ILogger<BooksController> _logger;
     private readonly ILiteDbBookService _bookService;
+    private readonly IDtoSanitizer _dtoSanitizer;
 
-    public BooksController(ILogger<BooksController> logger, ILiteDbBookService bookService)
+    public BooksController(ILogger<BooksController> logger, ILiteDbBookService bookService, IDtoSanitizer dtoSanitizer)
     {
       _logger = logger;
       _bookService = bookService;
+      _dtoSanitizer = dtoSanitizer;
     }
 
     // [HttpGet]
@@ -35,7 +36,12 @@ namespace Momus.Controllers
     [HttpPut("{id}")]
     public IActionResult Update(int id, BookDto book)
     {
-      if (_bookService.Update(book))
+      if (!ModelState.IsValid)
+      {
+        return BadRequest(ModelState);
+      }
+
+      if (_bookService.Update(_dtoSanitizer.Sanitize(book)))
         return NoContent();
       return NotFound();
     }
@@ -61,7 +67,7 @@ namespace Momus.Controllers
     [HttpPost]
     public ActionResult Add(BookDto bookDto)
     {
-      var id = _bookService.Add(bookDto);
+      var id = _bookService.Add(_dtoSanitizer.Sanitize(bookDto));
       if (id != default)
         // return CreatedAtAction(nameof(GetOne), _bookService.GetOne(id));
         return Ok();

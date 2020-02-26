@@ -26,6 +26,7 @@ namespace Momus
       services.AddSingleton<ILiteDbContext, LiteDbContext>();
       services.AddTransient<ILiteDbBookService, LiteDbBookService>();
       services.AddSingleton<IDtoMapper, DtoMapper>();
+      services.AddSingleton<IDtoSanitizer, DtoSanitizer>();
       services.AddControllers();
     }
 
