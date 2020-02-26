@@ -101,3 +101,15 @@ WantedBy=multi-user.target
 13. Verify it's actually running
 
   sudo systemctl status kestrel-momus.service
+
+== Updating
+
+. Publish the project through Visual Studio
+
+. Place the published files in `/var/www/data` and ensure permissions are set to `www-data`
+
+. Update the database to match data changes in the development environment, when necessary
+
+. Restart the service:
++
+  sudo systemctl restart kestrel-momus.service
