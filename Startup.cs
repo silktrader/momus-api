@@ -5,8 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Momus.Data;
-using Momus.LiteDb;
 using Momus.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;

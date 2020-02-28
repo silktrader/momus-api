@@ -1,16 +1,16 @@
 using LiteDB;
 using Microsoft.Extensions.Options;
-using Momus.LiteDb;
+using Momus.Models;
 
-namespace Momus.Data
+namespace Momus.Services
 {
-    public class LiteDbContext : ILiteDbContext
-{
+  public class LiteDbContext : ILiteDbContext
+  {
     public LiteDatabase Database { get; }
 
     public LiteDbContext(IOptions<LiteDbOptions> options)
     {
-        Database = new LiteDatabase(options.Value.DatabaseLocation);
+      Database = new LiteDatabase(options.Value.DatabaseLocation);
     }
-}
+  }
 }
