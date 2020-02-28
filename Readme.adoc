@@ -9,42 +9,52 @@ Data is saved to a _LiteDb database_, on file and provided via _REST_ endpoints.
 == Installation
 The following steps describe how to deploy the APIs to a somewhat recent Linux machine (Ubuntu's 18:04 in the author's case).
 
-1. Download and install Microsoft's .NET Core packages
+. Download and install Microsoft's .NET Core packages
 
   wget -q https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 
-2. update packages list
+. update packages list
 
   apt-get update
 
-3. install https transport package
+. install https transport package
 
   sudo apt-get install apt-transport-https
 
-4. install ASP.NET Core runtimes
+. install ASP.NET Core runtimes
 
   sudo apt-get install aspnetcore-runtime-3.1
 +
-[NOTE]
-====
-ASP.NET Core runtimes are sufficient. There's no need for the SDK unless one wants to build and publish the project from the server itself.
-====
+NOTE: ASP.NET Core runtimes are sufficient. There's no need for the SDK unless one wants to build and publish the project from the server itself.
 
-5. create folder where to store .NET published files
+. create folder where to store .NET published files
 
   mkdir /var/www/momus
 
-6. build the project on the development machine, selecting the right target `Linux x64`
+. build the project on the development machine, selecting the right target `Linux x64`
 
   dotnet publish --configuration Release
 
-7. package, SCP or otherwise transfer the release files to `/var/www/momus`
+. package, SCP or otherwise transfer the release files to `/var/www/momus`
 
-8. assign proper permissions when required by the web server
+. assign proper permissions when required by the web server
 
   chown -R www-data /var/www/momus
 
-9. edit `nginx` configuration so it includes the following server block:
+. create the file responsible for authentication settings, _including the administrator's password_, and place it in the root folder
++
+.authsettings.json
+[source]
+----
+{
+  "Authentication": {
+    "Secret": "choose a secret",
+    "AdminPassword": "choose a password"
+  }
+}
+----
+
+. edit `nginx` configuration so it includes the following server block:
 +
 ./etc/nginx/sites-enabled/default
 [source]
@@ -65,7 +75,7 @@ server {
 }
 ----
 
-10. create a service file to run the web API automatically
+. create a service file to run the web API automatically
 
   sudo vim /etc/systemd/system/kestrel-momus.service
 +
@@ -90,15 +100,15 @@ Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 WantedBy=multi-user.target
 ----
 
-11. Enable the service
+. Enable the service
 
   sudo systemctl enable kestrel-momus.service
 
-12. Start the service
+. Start the service
 
   sudo systemctl start kestrel-momus.service
 
-13. Verify it's actually running
+. Verify it's actually running
 
   sudo systemctl status kestrel-momus.service
 

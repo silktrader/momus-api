@@ -10,6 +10,7 @@ using Momus.LiteDb;
 using Momus.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Momus.Models;
 
 namespace Momus
 {
@@ -31,6 +32,10 @@ namespace Momus
       services.AddSingleton<IDtoMapper, DtoMapper>();
       services.AddSingleton<IDtoSanitizer, DtoSanitizer>();
 
+      // read authentication settings and configure them
+      var authSettings = Configuration.GetSection("Authentication");
+      services.Configure<AuthSettings>(authSettings);
+
       services.AddAuthentication(options =>
       {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -44,7 +49,7 @@ namespace Momus
               ValidateAudience = false,
               ValidateLifetime = true,
               ValidateIssuerSigningKey = true,
-              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("16charactersrequired")) // tk change me
+              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.Get<AuthSettings>().Secret))
             };
           });
 

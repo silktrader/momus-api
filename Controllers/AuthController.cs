@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+using System;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Momus.Models;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using System.Security.Claims;
+using Microsoft.Extensions.Options;
 
 namespace Momus.Controllers
 {
@@ -12,18 +12,25 @@ namespace Momus.Controllers
   [Route("api/[controller]")]
   public class AuthController : ControllerBase
   {
+    private readonly AuthSettings _authSettings;
+
+    public AuthController(IOptions<AuthSettings> authSettings)
+    {
+      _authSettings = authSettings.Value;
+    }
+
     [HttpPost("login")]
     public IActionResult Login(User user)
     {
-      if (user.Password != "replacepassword")
-        return Unauthorized("Invalid user name or password");
+      if (user.Password != _authSettings.AdminPassword)
+        return Unauthorized("Invalid administrator password");
 
       var tokenHandler = new JwtSecurityTokenHandler();
-      var key = System.Text.Encoding.ASCII.GetBytes("16charactersrequired"); // change me
+      var secret = Encoding.ASCII.GetBytes(_authSettings.Secret);
       var tokenDescriptor = new SecurityTokenDescriptor
       {
-        Expires = System.DateTime.Now.AddDays(10),
-        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+        Expires = DateTime.Now.AddDays(10),
+        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha512Signature)
       };
 
       var token = tokenHandler.CreateToken(tokenDescriptor);

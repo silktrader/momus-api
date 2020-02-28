@@ -11,6 +11,9 @@
 *.userosscache
 *.sln.docstates
 
+# Authentication settings
+authsettings.json
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
