@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Momus.Data;
 using Momus.LiteDb;
 using Momus.Services;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Momus
 {
@@ -27,6 +30,24 @@ namespace Momus
       services.AddTransient<ILiteDbBookService, LiteDbBookService>();
       services.AddSingleton<IDtoMapper, DtoMapper>();
       services.AddSingleton<IDtoSanitizer, DtoSanitizer>();
+
+      services.AddAuthentication(options =>
+      {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+      })
+          .AddJwtBearer(options =>
+          {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+              ValidateIssuer = false,
+              ValidateAudience = false,
+              ValidateLifetime = true,
+              ValidateIssuerSigningKey = true,
+              IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("16charactersrequired")) // tk change me
+            };
+          });
+
       services.AddControllers();
     }
 
@@ -40,7 +61,10 @@ namespace Momus
 
       //app.UseHttpsRedirection();
 
+      // AllowAnyOrigin() is a possibility
       app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().SetIsOriginAllowed((host) => true).AllowCredentials());
+
+      // needed to run with a reverse proxy such as Nginx
       app.UseForwardedHeaders(new ForwardedHeadersOptions
       {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -48,6 +72,7 @@ namespace Momus
 
       app.UseRouting();
 
+      app.UseAuthentication();
       app.UseAuthorization();
 
       app.UseEndpoints(endpoints =>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Momus.Models;
 using Momus.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Momus.Controllers
 {
@@ -33,6 +34,7 @@ namespace Momus.Controllers
       return _bookService.GetOne(shortUrl);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public IActionResult Update(int id, BookDto book)
     {
@@ -64,6 +66,7 @@ namespace Momus.Controllers
       return Ok(_bookService.GetLatest(latest));
     }
 
+    [Authorize]
     [HttpPost]
     public ActionResult Add(BookDto bookDto)
     {
